@@ -182,12 +182,42 @@ onload = function(){
     1.0, 1.0, 0.0, 1.0,
     0.0, 1.0, 0.0, 1.0,
   ];
-  set_attribute([vertex_position, vertex_color], attLocation, attStride);
+
+  var cube_vp = [
+    0.0,0.0,0.0,
+    1.0,0.0,0.0,
+    1.0,1.0,0.0,
+    0.0,1.0,0.0,
+    0.0,1.0,1.0,
+    0.0,0.0,1.0,
+    1.0,0.0,1.0,
+    1.0,1.0,1.0,
+  ];
+  var cube_vc = [
+    1.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 1.0,
+    1.0, 1.0, 0.0, 1.0,
+    1.0, 1.0, 0.0, 1.0,
+    1.0, 1.0, 0.0, 1.0,
+    1.0, 1.0, 0.0, 1.0,
+  ];
+
+  set_attribute([cube_vp, cube_vc], attLocation, attStride);
 
   var index = [
     0,1,2,
     2,1,3,];
-  var ibo = create_ibo(index);
+  var cube_idx = [
+    0,3,2, 2,1,0,
+    0,1,6, 6,5,0,
+    0,5,4, 4,3,0,
+    7,4,5, 5,6,7,
+    7,6,1, 1,2,7,
+    7,2,3, 3,4,7,
+  ];
+  var ibo = create_ibo(cube_idx);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
 
   let m = new matIV();
@@ -196,6 +226,7 @@ onload = function(){
   count=0;
   gl.enable(gl.CULL_FACE);//カリング（表裏判断）有効
   gl.frontFace(gl.CCW);//反時計回りを表
+  //gl.frontFace(gl.CW);//時計回りを表
   gl.enable(gl.DEPTH_TEST);//深度テスト有効
   gl.depthFunc(gl.LEQUAL);//テスト方法
   (function(){
@@ -213,16 +244,19 @@ onload = function(){
 
     // uniformLocationへ座標変換行列を登録と描画
     gl.uniformMatrix4fv(uniLocation, false, mvpMatrix);
-    gl.drawElements(gl.TRIANGLES, index.length, gl.UNSIGNED_SHORT, 0);// インデックスを用いた描画命令
+    gl.drawElements(gl.TRIANGLES, cube_idx.length, gl.UNSIGNED_SHORT, 0);// インデックスを用いた描画命令
+    //gl.drawElements(gl.TRIANGLES, index.length, gl.UNSIGNED_SHORT, 0);// インデックスを用いた描画命令
     //gl.drawArrays(gl.TRIANGLES, 0, 3);
 
     //モデル2
     mvpMatrix = m.identity(m.create());
     m.translate(vpMatrix, [0.0, x, y], mvpMatrix);
+    m.rotate(mvpMatrix, rad*2, [1,0,0], mvpMatrix);
 
     // uniformLocationへ座標変換行列を登録と描画
     gl.uniformMatrix4fv(uniLocation, false, mvpMatrix);
-    gl.drawElements(gl.TRIANGLES, index.length, gl.UNSIGNED_SHORT, 0);// インデックスを用いた描画命令
+    gl.drawElements(gl.TRIANGLES, cube_idx.length, gl.UNSIGNED_SHORT, 0);// インデックスを用いた描画命令
+    //gl.drawElements(gl.TRIANGLES, index.length, gl.UNSIGNED_SHORT, 0);// インデックスを用いた描画命令
 
     gl.flush();// コンテキストの再描画
     setTimeout(arguments.callee, 1000 / 30);//30fps
